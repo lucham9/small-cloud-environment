@@ -11,7 +11,7 @@ terraform {
 }
 
 provider "aws" {
-  region = "us-east-2"
+  region = "us-east-1"
   default_tags {
     tags = {
       Project     = var.project_name
@@ -33,11 +33,11 @@ variable "project_name" {
 
 variable "availability_zone" {
   type        = string
-  default     = "us-east-2a"
+  default     = "us-east-1a"
   description = "Both required subnets are in one AZ; this single-AZ topology is not highly available."
   validation {
-    condition     = can(regex("^us-east-2[a-c]$", var.availability_zone))
-    error_message = "Choose us-east-2a, us-east-2b or us-east-2c."
+    condition     = can(regex("^us-east-1[a-f]$", var.availability_zone))
+    error_message = "Choose an availability zone from us-east-1a through us-east-1f."
   }
 }
 
@@ -45,7 +45,7 @@ variable "key_name" {
   type        = string
   default     = null
   nullable    = true
-  description = "Optional EXISTING EC2 key pair in us-east-2. No private keys are generated. Prefer SSM."
+  description = "Optional EXISTING EC2 key pair in us-east-1. No private keys are generated. Prefer SSM."
 }
 
 variable "web_ingress_cidrs" {
@@ -85,14 +85,14 @@ variable "vpn" {
   }
   validation {
     condition = !var.vpn.enabled || (
-      can(regex("^arn:aws:ssm:us-east-2:[0-9]{12}:parameter/[A-Za-z0-9_./-]+$", var.vpn.psk_parameter_arn)) &&
+      can(regex("^arn:aws:ssm:us-east-1:[0-9]{12}:parameter/[A-Za-z0-9_./-]+$", var.vpn.psk_parameter_arn)) &&
       !can(regex("^(192\\.0\\.2\\.|198\\.51\\.100\\.|203\\.0\\.113\\.|10\\.|172\\.(1[6-9]|2[0-9]|3[01])\\.|192\\.168\\.|0\\.|127\\.|169\\.254\\.|100\\.(6[4-9]|[7-9][0-9]|1[01][0-9]|12[0-7])\\.|(22[4-9]|23[0-9]|24[0-9]|25[0-5])\\.)", var.vpn.peer_public_ip))
     )
-    error_message = "Enabled VPN requires a real public peer IPv4 address and an existing us-east-2 SSM parameter ARN."
+    error_message = "Enabled VPN requires a real public peer IPv4 address and an existing us-east-1 SSM parameter ARN."
   }
   validation {
-    condition     = var.vpn.kms_key_arn == null || can(regex("^arn:aws:kms:us-east-2:[0-9]{12}:key/[A-Za-z0-9-]+$", var.vpn.kms_key_arn))
-    error_message = "kms_key_arn must be null or a us-east-2 KMS key ARN."
+    condition     = var.vpn.kms_key_arn == null || can(regex("^arn:aws:kms:us-east-1:[0-9]{12}:key/[A-Za-z0-9-]+$", var.vpn.kms_key_arn))
+    error_message = "kms_key_arn must be null or a us-east-1 KMS key ARN."
   }
 }
 
@@ -399,7 +399,7 @@ resource "aws_iam_role_policy" "vpn_secret" {
       [{ Effect = "Allow", Action = ["ssm:GetParameter"], Resource = var.vpn.psk_parameter_arn }],
       var.vpn.kms_key_arn == null ? [] : [{
         Effect    = "Allow", Action = ["kms:Decrypt"], Resource = var.vpn.kms_key_arn
-        Condition = { StringEquals = { "kms:ViaService" = "ssm.us-east-2.amazonaws.com" } }
+        Condition = { StringEquals = { "kms:ViaService" = "ssm.us-east-1.amazonaws.com" } }
       }]
     )
   })
@@ -652,7 +652,7 @@ resource "aws_instance" "windows" {
 
 output "network" {
   value = {
-    region          = "us-east-2", vpc_id = aws_vpc.school.id,
+    region          = "us-east-1", vpc_id = aws_vpc.school.id,
     vpc_cidr        = local.vpc_cidr, external_subnet = local.external_cidr,
     internal_subnet = local.internal_cidr, firewall_public_ip = aws_eip.firewall.public_ip
   }

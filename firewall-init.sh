@@ -140,7 +140,7 @@ import re
 import tempfile
 import boto3
 
-psk = boto3.client("ssm", region_name="us-east-2").get_parameter(
+psk = boto3.client("ssm", region_name="us-east-1").get_parameter(
     Name="${psk_parameter_arn}", WithDecryption=True
 )["Parameter"]["Value"]
 if not re.fullmatch(r"[A-Za-z0-9+/=_-]{32,128}", psk):

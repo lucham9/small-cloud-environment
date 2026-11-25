@@ -2,11 +2,11 @@
 
 AWS infrastructure for an Ann Arbor organization with approximately 20 staff and 150–200 users. A virtual firewall connects the premises through IPsec, while external and internal subnets separate public-facing services from directory, certificate, authentication and application systems.
 
-**Status: Validated and planned; no AWS resources deployed.** Terraform installs Windows role features; domain, CA and NPS configuration requires the included PowerShell helper and organization-specific settings. See [VALIDATION.txt](VALIDATION.txt) for test results and limitations.
+**Status: Locally validated; no AWS resources deployed.** Terraform installs Windows role features; domain, CA and NPS configuration requires the included PowerShell helper and organization-specific settings. See [VALIDATION.txt](VALIDATION.txt) for test results and limitations.
 
 ## Architecture
 
-- **Region / AZ:** `us-east-2` / `us-east-2a`.
+- **Region / AZ:** `us-east-1` / `us-east-1a`.
 - **VPC:** `10.20.0.0/16`.
 - **External subnet:** `10.20.1.0/24`, with firewall and web.
 - **Internal subnet:** `10.20.2.0/24`, with four Windows servers, app and monitor.
@@ -28,7 +28,7 @@ AWS infrastructure for an Ann Arbor organization with approximately 20 staff and
 | Four Windows Server 2022 | `c6i.xlarge` | 4 / 8 GiB | 60 GiB |
 | Four Ubuntu 24.04 | `t3.medium` | 2 / 4 GiB | 30 GiB |
 
-Total capacity: **24 vCPUs, 48 GiB RAM and 360 GiB storage**. Ohio is a nearby regional hosting choice; actual network latency depends on the premises connection.
+Total capacity: **24 vCPUs, 48 GiB RAM and 360 GiB storage**. Northern Virginia is the selected eastern US hosting region; actual network latency depends on the premises connection.
 
 ## Files and validation
 
@@ -69,7 +69,7 @@ The premises team supplies a static public peer and a non-overlapping RFC1918 LA
 - Transport: UDP 500 and forced ESP-in-UDP 4500, restricted to the peer.
 - Both route tables return premises traffic through the firewall. Protected traffic requires IPsec policies and is exempt from NAT; cleartext fallback is denied.
 
-Store a random 64-character hexadecimal PSK outside Terraform as an SSM SecureString in `us-east-2`. Supply only its ARN and, if applicable, the customer-managed KMS key ARN. The firewall retrieves it with scoped IAM permissions and writes a root-only configuration. Configure matching identities, selectors, proposals, NAT exemptions and return routes on the premises appliance. VPN remains disabled until real details are supplied.
+Store a random 64-character hexadecimal PSK outside Terraform as an SSM SecureString in `us-east-1`. Supply only its ARN and, if applicable, the customer-managed KMS key ARN. The firewall retrieves it with scoped IAM permissions and writes a root-only configuration. Configure matching identities, selectors, proposals, NAT exemptions and return routes on the premises appliance. VPN remains disabled until real details are supplied.
 
 ## Windows configuration
 
@@ -101,4 +101,4 @@ This single-AZ design has one firewall/VPN endpoint and single-instance CA, NPS,
 
 A full launch requires 24 available standard On-Demand vCPUs. Actual operation incurs compute, storage, two public IPv4 addresses and applicable transfer charges. Use encrypted, access-controlled remote Terraform state for operational use. Never commit credentials, private keys, real variable files, state or saved plans.
 
-Local checks and a successful AWS plan do not prove EC2 first boot, a working Windows domain, certificate services, RADIUS authentication or a negotiated premises VPN. Those remain unverified on deployed resources.
+Local checks and the earlier Ohio AWS plan do not prove EC2 first boot, a working Windows domain, certificate services, RADIUS authentication or a negotiated premises VPN. The current Northern Virginia revision has not had an AWS-backed plan; these services remain unverified on deployed resources.

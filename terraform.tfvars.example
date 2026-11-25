@@ -1,6 +1,6 @@
 # Small cloud environment: safe sample settings. No credentials or secret values.
 project_name      = "small-cloud-environment"
-availability_zone = "us-east-2a"
+availability_zone = "us-east-1a"
 key_name          = null
 
 # Optional internet HTTP publication through the firewall. Empty disables it.
@@ -8,7 +8,7 @@ key_name          = null
 web_ingress_cidrs = []
 
 # Disabled until the premises team provides real endpoint/network details.
-# The PSK must already exist as an SSM SecureString in us-east-2; use only its ARN.
+# The PSK must already exist as an SSM SecureString in us-east-1; use only its ARN.
 vpn = {
   enabled           = false
   peer_public_ip    = "192.0.2.10"

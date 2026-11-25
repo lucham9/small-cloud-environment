@@ -1,9 +1,9 @@
 Small cloud environment — Validation record
-Date: November 24, 2026 (America/New_York)
-Status: Configuration validated and planned; no AWS resources deployed.
+Date: November 25, 2026 (America/New_York)
+Status: Current region configuration validated locally; no AWS resources deployed.
 
 DESIGN VERIFIED
-  Region: us-east-2; default availability zone: us-east-2a.
+  Region: us-east-1; default availability zone: us-east-1a.
   One VPC: 10.20.0.0/16.
   External subnet: 10.20.1.0/24, firewall and web Ubuntu systems.
   Internal subnet: 10.20.2.0/24, app/monitor Ubuntu systems and four Windows systems.
@@ -32,13 +32,18 @@ TERRAFORM CHECKS
   placement, Windows feature selections, source/destination checking, routing,
   restricted service ingress, IMDSv2 and rejection of invalid inputs.
 
-AWS READ-ONLY PLAN
-  PASS — Current configuration: 88 to add, 0 to change, 0 to destroy.
-  Public AMI parameters resolved successfully for Windows Server 2022 and
-  Ubuntu Server 24.04 amd64. A plan does not guarantee capacity, quotas or
-  authorization for every creation operation.
+AWS READ-ONLY PLAN HISTORY
+  An earlier us-east-2 revision passed a read-only AWS plan on November 24, 2026:
+  88 to add, 0 to change, 0 to destroy. Public Windows/Ubuntu AMI parameters
+  resolved at that time. This historical plan does not validate us-east-1.
+  On November 25, 2026, the selected region was changed to us-east-1. The provider,
+  default AZ and AZ validation, SSM/KMS ARN validation, IAM KMS service condition,
+  firewall SSM client, outputs, examples and test fixtures were updated together.
+  Formatting, schema validation, all six mocked tests and rendered Linux bootstrap
+  checks passed again on the current revision. AWS-backed planning in us-east-1
+  has not been performed; regional AMI lookup, quota and capacity remain unverified.
   No apply, quota-change request or deployment workflow was run.
-  Temporary credentials and private saved plans are excluded from this repository.
+  Temporary credentials and saved plan files are not part of this repository.
 
 BOOTSTRAP CHECKS
   PASS — All four Linux user-data scripts rendered and passed Bash syntax checks.

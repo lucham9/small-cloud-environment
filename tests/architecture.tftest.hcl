@@ -106,8 +106,8 @@ run "vpn_and_http_configuration" {
       # Synthetic public address for MOCKED plan only; no traffic is sent here.
       peer_public_ip    = "8.8.8.8"
       remote_cidr       = "192.168.50.0/24"
-      psk_parameter_arn = "arn:aws:ssm:us-east-2:123456789012:parameter/school/vpn/psk"
-      kms_key_arn       = "arn:aws:kms:us-east-2:123456789012:key/00000000-0000-0000-0000-000000000000"
+      psk_parameter_arn = "arn:aws:ssm:us-east-1:123456789012:parameter/school/vpn/psk"
+      kms_key_arn       = "arn:aws:kms:us-east-1:123456789012:key/00000000-0000-0000-0000-000000000000"
     }
   }
   assert {
@@ -127,7 +127,7 @@ run "vpn_and_http_configuration" {
     error_message = "IKE and NAT-T must be restricted to the exact school peer."
   }
   assert {
-    condition     = jsondecode(aws_iam_role_policy.vpn_secret[0].policy).Statement[0].Resource == "arn:aws:ssm:us-east-2:123456789012:parameter/school/vpn/psk" && aws_iam_role_policy.vpn_secret[0].role == aws_iam_role.instance["firewall"].id
+    condition     = jsondecode(aws_iam_role_policy.vpn_secret[0].policy).Statement[0].Resource == "arn:aws:ssm:us-east-1:123456789012:parameter/school/vpn/psk" && aws_iam_role_policy.vpn_secret[0].role == aws_iam_role.instance["firewall"].id
     error_message = "Only the firewall role may read the named VPN secret."
   }
   assert {
@@ -160,7 +160,7 @@ run "reject_enabled_placeholder_peer" {
       enabled           = true
       peer_public_ip    = "192.0.2.10"
       remote_cidr       = "192.168.50.0/24"
-      psk_parameter_arn = "arn:aws:ssm:us-east-2:123456789012:parameter/school/vpn/psk"
+      psk_parameter_arn = "arn:aws:ssm:us-east-1:123456789012:parameter/school/vpn/psk"
     }
   }
   expect_failures = [var.vpn]
@@ -177,7 +177,7 @@ run "reject_invalid_web_cidr" {
 run "reject_wrong_region_az" {
   command = plan
   variables {
-    availability_zone = "us-east-1a"
+    availability_zone = "us-west-2a"
   }
   expect_failures = [var.availability_zone]
 }
