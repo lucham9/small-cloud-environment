@@ -1,0 +1,22 @@
+# Small cloud environment: safe sample settings. No credentials or secret values.
+project_name      = "small-cloud-environment"
+availability_zone = "us-east-2a"
+key_name          = null
+
+# Optional internet HTTP publication through the firewall. Empty disables it.
+# Supply approved client IPv4 ranges, preferably specific public /32 addresses.
+web_ingress_cidrs = []
+
+# Disabled until the premises team provides real endpoint/network details.
+# The PSK must already exist as an SSM SecureString in us-east-2; use only its ARN.
+vpn = {
+  enabled           = false
+  peer_public_ip    = "192.0.2.10"
+  remote_cidr       = "192.168.50.0/24"
+  psk_parameter_arn = ""
+  kms_key_arn       = null
+}
+# Before enabling, replace the documentation peer with a real static public IP,
+# set the real non-overlapping RFC1918 premises CIDR, and supply the SSM ARN.
+# If using a customer-managed KMS key, also supply its ARN and key-policy access.
+# Never store a PSK, domain password, RADIUS secret, AWS key or private key here.

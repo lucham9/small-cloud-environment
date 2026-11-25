@@ -1,0 +1,50 @@
+# Terraform runtime files, state, plans, and private variable files
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+*.plan
+plan.json
+terraform.tfvars
+terraform.tfvars.json
+*.auto.tfvars
+*.auto.tfvars.json
+*.tfvars
+*.tfvars.json
+!terraform.tfvars.example
+crash.log
+crash.*.log
+terraform.rc
+.terraformrc
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+# Keep .terraform.lock.hcl: it contains provider checksums, not credentials.
+
+# Keys, credentials, environment files, and private VPN configuration
+*.pem
+*.key
+*.pfx
+*.p12
+*.ppk
+*.tfbackend
+.env
+.env.*
+!.env.example
+.aws/
+credentials
+secrets/
+*secret*.json
+swanctl.conf
+ipsec.secrets
+
+# Local editor, archive, and check artifacts
+.vscode/
+.idea/
+__pycache__/
+*.pyc
+*.zip
+*.log
+rendered/
+terraform-test-*.tfstate

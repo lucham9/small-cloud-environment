@@ -1,0 +1,86 @@
+Small cloud environment — Validation record
+Date: November 24, 2026 (America/New_York)
+Status: Configuration validated and planned; no AWS resources deployed.
+
+DESIGN VERIFIED
+  Region: us-east-2; default availability zone: us-east-2a.
+  One VPC: 10.20.0.0/16.
+  External subnet: 10.20.1.0/24, firewall and web Ubuntu systems.
+  Internal subnet: 10.20.2.0/24, app/monitor Ubuntu systems and four Windows systems.
+  Windows: DC1, DC2, MSCA (AD CS) and NPS; c6i.xlarge, 4 vCPU / 8 GiB RAM,
+           60-GiB encrypted gp3 root storage per server.
+  Ubuntu: firewall, web, app and monitor; t3.medium, 2 vCPU / 4 GiB RAM,
+          30-GiB encrypted gp3 root storage per server.
+  Total: 24 vCPU, 48 GiB RAM, 360 GiB encrypted storage.
+  Two Elastic IPs: firewall VPN/publication endpoint and external web egress.
+  VPN disabled until real premises endpoint, network and external PSK ARN are supplied.
+  Optional internet HTTP publication disabled by default.
+
+TERRAFORM CHECKS
+  PASS — terraform fmt -check -recursive
+  PASS — terraform validate: Success! The configuration is valid.
+  PASS — terraform test: 6 passed, 0 failed.
+    default_architecture
+    vpn_and_http_configuration
+    reject_overlapping_school_network
+    reject_enabled_placeholder_peer
+    reject_invalid_web_cidr
+    reject_wrong_region_az
+
+  All test runs use command=plan and a mocked AWS provider. They check counts,
+  sizes, disk encryption/capacity, AMI lookup paths, exact Linux/Windows subnet
+  placement, Windows feature selections, source/destination checking, routing,
+  restricted service ingress, IMDSv2 and rejection of invalid inputs.
+
+AWS READ-ONLY PLAN
+  PASS — Current configuration: 88 to add, 0 to change, 0 to destroy.
+  Public AMI parameters resolved successfully for Windows Server 2022 and
+  Ubuntu Server 24.04 amd64. A plan does not guarantee capacity, quotas or
+  authorization for every creation operation.
+  No apply, quota-change request or deployment workflow was run.
+  Temporary credentials and private saved plans are excluded from this repository.
+
+BOOTSTRAP CHECKS
+  PASS — All four Linux user-data scripts rendered and passed Bash syntax checks.
+  PASS — Embedded application and VPN helper passed Python syntax checks.
+  PASS — VPN helper rendered expected selectors and a quoted synthetic PSK in
+         an isolated directory using a stubbed SSM client.
+  PASS — All four Windows bootstraps rendered with the correct role features.
+  PASS — Four rendered Windows scripts and windows-roles.ps1 passed PowerShell
+         parser checks; Windows role commands were not executed.
+  PASS — All raw EC2 user-data samples below the 16,384-byte limit.
+
+UBUNTU 24.04 LOCAL INTEGRATION
+  Tested in a disposable Ubuntu 24.04 container with a separate network namespace:
+  PASS — Reference app /health returned HTTP 200 and expected JSON.
+  PASS — Unknown application path returned HTTP 404.
+  PASS — Actual nginx configuration passed nginx -t and served the web page.
+  PASS — nginx /api/health reached the application through a container-local
+         alias for the configured application private IP.
+  PASS — Actual Prometheus configuration passed promtool and became ready.
+  PASS — Prometheus targets API and node exporter memory metrics responded.
+  PASS — Generated enabled/disabled VPN and HTTP firewall rules were accepted by
+         iptables-restore --test. These rules were not installed on the computer.
+  PASS — strongSwan loaded the connection and synthetic IKE credentials with
+         automatic tunnel initiation disabled only in the test configuration.
+         Optional-plugin and unused certificate-directory notices were emitted;
+         connection and secret loading succeeded. No VPN was negotiated.
+
+TOOLS
+  Terraform CLI 1.14.0; hashicorp/aws 6.22.0 with dependency lock checksums.
+  GNU Bash 5.3.15 and Python 3.11 for local script checks.
+  PowerShell parser for Windows script syntax.
+  Ubuntu 24.04 container packages for Linux runtime/parser checks.
+
+LIMITATIONS
+  Local containers are not EC2 AMIs or a complete multi-server AWS environment.
+  Actual AWS packet forwarding, AWS security-group enforcement, Linux/Windows
+  EC2 first boot, Windows feature installation and systemd boot ordering were
+  not tested on deployed instances.
+  The Windows helper is operator-driven and requires an approved domain name,
+  administrative context, secure passwords, controlled restarts and PKI/RADIUS
+  policy decisions. AD promotion/replication, CA initialization/issuance/revocation,
+  NPS registration/authentication and domain membership were not executed.
+  A real premises VPN peer and secret were not supplied; negotiation, failover,
+  protected traffic in either direction and premises routing remain unverified.
+  This record does not claim production readiness or successful AWS deployment.
